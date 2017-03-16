@@ -173,7 +173,9 @@ namespace Microsoft.PSharp
         protected void Goto(Type s)
         {
             // If the state is not a state of the monitor, then report an error and exit.
-            this.Assert(StateTypeMap[this.GetType()].Contains(s), $"Monitor '{this.GetType().Name}' " +
+            this.Assert(StateTypeMap[this.GetType()].Any(val
+                => val.DeclaringType.Equals(s.DeclaringType) &&
+                val.Name.Equals(s.Name)), $"Monitor '{base.Id}' " +
                 $"is trying to transition to non-existing state '{s.Name}'.");
             this.Raise(new GotoStateEvent(s));
         }
