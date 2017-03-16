@@ -320,6 +320,18 @@ namespace Microsoft.PSharp
         }
 
         /// <summary>
+        /// Invokes the specified monitor with the specified event.
+        /// </summary>
+        /// <param name="T">Type of the monitor</param>
+        /// <param name="e">Event</param>
+        protected void Monitor(Type T, Event e)
+        {
+            // If the event is null, then report an error and exit.
+            this.Assert(e != null, $"Machine '{base.Id}' is sending a null event.");
+            base.Runtime.Monitor(T, this, e);
+        }
+
+        /// <summary>
         /// Transitions the machine to the specified state
         /// at the end of the current action.
         /// </summary>

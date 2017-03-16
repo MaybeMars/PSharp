@@ -282,6 +282,19 @@ namespace Microsoft.PSharp
         }
 
         /// <summary>
+        /// Invokes the specified monitor with the specified event.
+        /// </summary>
+        /// <param name="T">Type of the monitor</param>
+        /// <param name="e">Event</param>
+        public virtual void InvokeMonitor(Type T, Event e)
+        {
+            // If the event is null then report an error and exit.
+            this.Assert(e != null, "Cannot monitor a null event.");
+            this.Monitor(T, null, e);
+        }
+
+
+        /// <summary>
         /// Returns a nondeterministic boolean choice, that can be controlled
         /// during analysis or testing.
         /// </summary>
@@ -615,6 +628,17 @@ namespace Microsoft.PSharp
         /// <param name="e">Event</param>
         internal virtual void Monitor<T>(AbstractMachine sender, Event e)
         {
+            Monitor(typeof(T), sender, e);
+        }
+
+        /// <summary>
+        /// Invokes the specified monitor with the specified event.
+        /// </summary>
+        /// <param name="T">Type of the monitor</param> 
+        /// <param name="sender">Sender machine</param>
+        /// <param name="e">Event</param>
+        internal virtual void Monitor(Type T, AbstractMachine sender, Event e)
+        {
             if (!this.Configuration.EnableMonitorsInProduction)
             {
                 // No-op in production.
@@ -627,7 +651,7 @@ namespace Microsoft.PSharp
             {
                 foreach (var m in this.Monitors)
                 {
-                    if (m.GetType() == typeof(T))
+                    if (m.GetType() == T)
                     {
                         monitor = m;
                         break;
