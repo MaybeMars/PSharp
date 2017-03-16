@@ -460,12 +460,12 @@ namespace Microsoft.PSharp.TestingServices
         }
 
         /// <summary>
-        /// Invokes the specified monitor with the given event.
+        /// Invokes the specified monitor with the specified event.
         /// </summary>
+        /// <param name="T">Type of the monitor</param> 
         /// <param name="sender">Sender machine</param>
-        /// <typeparam name="T">Type of the monitor</typeparam>
         /// <param name="e">Event</param>
-        internal override void Monitor<T>(AbstractMachine sender, Event e)
+        internal override void Monitor(Type T, AbstractMachine sender, Event e)
         {
             if (sender != null)
             {
@@ -474,7 +474,7 @@ namespace Microsoft.PSharp.TestingServices
 
             foreach (var m in base.Monitors)
             {
-                if (m.GetType() == typeof(T))
+                if (m.GetType() == T)
                 {
                     if(this.Configuration.ReportCodeCoverage)
                     {
