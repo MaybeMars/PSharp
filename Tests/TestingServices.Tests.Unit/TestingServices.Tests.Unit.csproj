@@ -67,6 +67,7 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="Concurrency\ExternalConcurrencyTest.cs" />
     <Compile Include="Feature1SMLevelDecls\Correct\MaxInstances2Test.cs" />
     <Compile Include="Feature1SMLevelDecls\Correct\MethodCallTest.cs" />
     <Compile Include="Feature1SMLevelDecls\Correct\BugRepro1Test.cs" />
@@ -92,6 +93,7 @@
     <Compile Include="Integration\Correct\ExternalCalls\ReceivingExternalEventTest.cs" />
     <Compile Include="Feature2Stmts\Correct\TestIgnoreRaised.cs" />
     <Compile Include="Integration\Correct\OneMachine\SEMOneMachine42Test.cs" />
+    <Compile Include="Integration\DynamicError\Advanced\RaftTest.cs" />
     <Compile Include="Integration\DynamicError\OneMachine\SEMOneMachine38Test.cs" />
     <Compile Include="Integration\DynamicError\OneMachine\SEMOneMachine37Test.cs" />
     <Compile Include="Integration\DynamicError\OneMachine\SEMOneMachine36Test.cs" />
