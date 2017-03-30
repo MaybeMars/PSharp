@@ -136,10 +136,15 @@ namespace Microsoft.PSharp.Remote
         /// Returns the local endpoint.
         /// </summary>
         /// <returns>Endpoint</returns>
-        string INetworkProvider.GetLocalEndPoint()
+        string INetworkProvider.GetLocalEndpoint()
         {
             return this.IpAddress + ":" + this.Port;
         }
+
+        /// <summary>
+        /// Disposes the network provider.
+        /// </summary>
+        public void Dispose() { }
 
         #endregion
 

@@ -1,5 +1,5 @@
 ﻿//-----------------------------------------------------------------------
-// <copyright file="DefaultNetworkProvider.cs">
+// <copyright file="INetworkProvider.cs">
 //      Copyright (c) Microsoft Corporation. All rights reserved.
 // 
 //      THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
@@ -17,40 +17,10 @@ using System;
 namespace Microsoft.PSharp.Net
 {
     /// <summary>
-    /// Class implementing the default P# network provider.
+    /// Interface for a P# network provider.
     /// </summary>
-    internal class DefaultNetworkProvider : INetworkProvider
+    public interface INetworkProvider : IDisposable
     {
-        #region fields
-
-        /// <summary>
-        /// Instance of the P# runtime.
-        /// </summary>
-        private PSharpRuntime Runtime;
-
-        /// <summary>
-        /// The local endpoint.
-        /// </summary>
-        private string LocalEndPoint;
-
-        #endregion
-
-        #region constructors
-
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        /// <param name="runtime">PSharpRuntime</param>
-        public DefaultNetworkProvider(PSharpRuntime runtime)
-        {
-            this.Runtime = runtime;
-            this.LocalEndPoint = "";
-        }
-
-        #endregion
-
-        #region methods
-
         /// <summary>
         /// Creates a new remote machine of the specified type
         /// and with the specified event. An optional friendly
@@ -62,31 +32,19 @@ namespace Microsoft.PSharp.Net
         /// <param name="endpoint">Endpoint</param>
         /// <param name="e">Event</param>
         /// <returns>MachineId</returns> 
-        MachineId INetworkProvider.RemoteCreateMachine(Type type, string friendlyName,
-            string endpoint, Event e)
-        {
-            return this.Runtime.CreateMachine(type, friendlyName, e);
-        }
+        MachineId RemoteCreateMachine(Type type, string friendlyName, string endpoint, Event e);
 
         /// <summary>
-        /// Sends an asynchronous event to a machine.
+        /// Sends an event to a remote machine.
         /// </summary>
         /// <param name="target">Target machine id</param>
         /// <param name="e">Event</param>
-        void INetworkProvider.RemoteSend(MachineId target, Event e)
-        {
-            this.Runtime.SendEvent(target, e);
-        }
+        void RemoteSend(MachineId target, Event e);
 
         /// <summary>
         /// Returns the local endpoint.
         /// </summary>
         /// <returns>Endpoint</returns>
-        string INetworkProvider.GetLocalEndPoint()
-        {
-            return this.LocalEndPoint;
-        }
-
-        #endregion
+        string GetLocalEndpoint();
     }
 }

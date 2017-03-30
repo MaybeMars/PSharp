@@ -1,5 +1,5 @@
 ﻿//-----------------------------------------------------------------------
-// <copyright file="Liveness3Test.cs">
+// <copyright file="Liveness2LoopMachineTest.cs">
 //      Copyright (c) Microsoft Corporation. All rights reserved.
 // 
 //      THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
@@ -12,14 +12,12 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
-using Microsoft.PSharp.Utilities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System.Collections.Generic;
 
 namespace Microsoft.PSharp.TestingServices.Tests.Unit
 {
     [TestClass]
-    public class Liveness3Test
+    public class Liveness2LoopMachineTest
     {
         class Unit : Event { }
         class UserEvent : Event { }
@@ -51,7 +49,6 @@ namespace Microsoft.PSharp.TestingServices.Tests.Unit
             }
 
             [OnEntry(nameof(HandleEventOnEntry))]
-            [OnEventGotoState(typeof(Done), typeof(HandleEvent))]
             class HandleEvent : MachineState { }
 
             void HandleEventOnEntry()
@@ -98,21 +95,19 @@ namespace Microsoft.PSharp.TestingServices.Tests.Unit
         }
 
         [TestMethod]
-        public void TestLiveness3()
+        public void TestLiveness2LoopMachine()
         {
             var configuration = Configuration.Create();
             configuration.SuppressTrace = true;
-            configuration.Verbose = 3;
-            configuration.CacheProgramState = true;
+            configuration.Verbose = 2;
             configuration.SchedulingIterations = 100;
+            configuration.LivenessTemperatureThreshold = 200;
 
             var engine = TestingEngineFactory.CreateBugFindingEngine(
                 configuration, TestProgram.Execute);
             engine.Run();
 
-            var bugReport = "Monitor 'WatchDog' detected infinite execution that violates a liveness property.";
-            Assert.IsTrue(engine.TestReport.BugReports.Count == 1);
-            Assert.IsTrue(engine.TestReport.BugReports.Contains(bugReport));
+            Assert.AreEqual(1, engine.TestReport.NumOfFoundBugs);
         }
     }
 }

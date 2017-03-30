@@ -19,8 +19,6 @@ using System.Runtime.ExceptionServices;
 using System.Text;
 using System.Threading.Tasks;
 
-using Microsoft.PSharp.Utilities;
-
 namespace Microsoft.PSharp.TestingServices
 {
     /// <summary>
@@ -140,7 +138,7 @@ namespace Microsoft.PSharp.TestingServices
             {
                 try
                 {
-                    var runtime = new PSharpBugFindingRuntime(base.Configuration, base.Strategy);
+                    var runtime = new BugFindingRuntime(base.Configuration, base.Strategy);
 
                     StringWriter sw = null;
                     if (base.Configuration.RedirectTestConsoleOutput &&

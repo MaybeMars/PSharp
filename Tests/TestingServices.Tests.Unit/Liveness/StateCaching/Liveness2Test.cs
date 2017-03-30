@@ -1,5 +1,5 @@
 ﻿//-----------------------------------------------------------------------
-// <copyright file="WarmStateBugTest.cs">
+// <copyright file="Liveness2Test.cs">
 //      Copyright (c) Microsoft Corporation. All rights reserved.
 // 
 //      THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
@@ -14,12 +14,11 @@
 
 using Microsoft.PSharp.Utilities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System.Collections.Generic;
 
 namespace Microsoft.PSharp.TestingServices.Tests.Unit
 {
     [TestClass]
-    public class WarmStateBugTest
+    public class Liveness2Test
     {
         class Unit : Event { }
         class UserEvent : Event { }
@@ -50,7 +49,7 @@ namespace Microsoft.PSharp.TestingServices.Tests.Unit
             }
 
             [OnEntry(nameof(HandleEventOnEntry))]
-            [OnEventGotoState(typeof(Done), typeof(WaitForUser))]
+            [OnEventGotoState(typeof(Done), typeof(HandleEvent))]
             class HandleEvent : MachineState { }
 
             void HandleEventOnEntry()
@@ -63,6 +62,7 @@ namespace Microsoft.PSharp.TestingServices.Tests.Unit
         class WatchDog : Monitor
         {
             [Start]
+            [Cold]
             [OnEventGotoState(typeof(Waiting), typeof(CanGetUserInput))]
             [OnEventGotoState(typeof(Computing), typeof(CannotGetUserInput))]
             class CanGetUserInput : MonitorState { }
@@ -84,7 +84,7 @@ namespace Microsoft.PSharp.TestingServices.Tests.Unit
         }
 
         [TestMethod]
-        public void TestWarmStateBug()
+        public void TestLiveness2()
         {
             var configuration = Configuration.Create();
             configuration.SuppressTrace = true;

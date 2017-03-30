@@ -18,7 +18,6 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 using Microsoft.PSharp.IO;
-using Microsoft.PSharp.Utilities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Microsoft.PSharp.Core.Tests.Unit
@@ -125,17 +124,6 @@ namespace Microsoft.PSharp.Core.Tests.Unit
             }
         }
 
-        public static class Program
-        {
-            [Test]
-            public static void Execute(PSharpRuntime runtime)
-            {
-                var tcs = new TaskCompletionSource<bool>();
-                runtime.CreateMachine(typeof(M), new Configure(tcs));
-                tcs.Task.Wait();
-            }
-        }
-
         [TestMethod]
         public void TestCustomLogger()
         {
@@ -145,7 +133,9 @@ namespace Microsoft.PSharp.Core.Tests.Unit
             PSharpRuntime runtime = PSharpRuntime.Create(config);
             runtime.SetLogger(logger);
 
-            Program.Execute(runtime);
+            var tcs = new TaskCompletionSource<bool>();
+            runtime.CreateMachine(typeof(M), new Configure(tcs));
+            tcs.Task.Wait();
 
             string expected = @"<CreateLog> Machine 'Microsoft.PSharp.Core.Tests.Unit.CustomLoggerTest+M()' is created.
 <StateLog> Machine 'Microsoft.PSharp.Core.Tests.Unit.CustomLoggerTest+M()' enters state 'Microsoft.PSharp.Core.Tests.Unit.CustomLoggerTest+M.Init'.
@@ -180,7 +170,9 @@ namespace Microsoft.PSharp.Core.Tests.Unit
             PSharpRuntime runtime = PSharpRuntime.Create();
             runtime.SetLogger(logger);
 
-            Program.Execute(runtime);
+            var tcs = new TaskCompletionSource<bool>();
+            runtime.CreateMachine(typeof(M), new Configure(tcs));
+            tcs.Task.Wait();
 
             Assert.AreEqual("", logger.ToString());
 

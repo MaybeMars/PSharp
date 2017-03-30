@@ -1,5 +1,5 @@
 ﻿//-----------------------------------------------------------------------
-// <copyright file="Liveness2Test.cs">
+// <copyright file="Liveness3Test.cs">
 //      Copyright (c) Microsoft Corporation. All rights reserved.
 // 
 //      THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
@@ -12,14 +12,12 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
-using Microsoft.PSharp.Utilities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System.Collections.Generic;
 
 namespace Microsoft.PSharp.TestingServices.Tests.Unit
 {
     [TestClass]
-    public class Liveness2Test
+    public class Liveness3Test
     {
         class Unit : Event { }
         class UserEvent : Event { }
@@ -36,6 +34,7 @@ namespace Microsoft.PSharp.TestingServices.Tests.Unit
 
             void InitOnEntry()
             {
+                this.CreateMachine(typeof(Loop));
                 this.Raise(new Unit());
             }
 
@@ -56,6 +55,18 @@ namespace Microsoft.PSharp.TestingServices.Tests.Unit
             void HandleEventOnEntry()
             {
                 this.Monitor<WatchDog>(new Computing());
+            }
+        }
+
+        class Loop : Machine
+        {
+            [Start]
+            [OnEntry(nameof(LoopingOnEntry))]
+            [OnEventGotoState(typeof(Done), typeof(Looping))]
+            class Looping : MachineState { }
+
+            void LoopingOnEntry()
+            {
                 this.Send(this.Id, new Done());
             }
         }
@@ -85,13 +96,13 @@ namespace Microsoft.PSharp.TestingServices.Tests.Unit
         }
 
         [TestMethod]
-        public void TestLiveness2()
+        public void TestLiveness3()
         {
             var configuration = Configuration.Create();
             configuration.SuppressTrace = true;
-            configuration.Verbose = 2;
+            configuration.Verbose = 3;
             configuration.CacheProgramState = true;
-            configuration.SchedulingStrategy = SchedulingStrategy.DFS;
+            configuration.SchedulingIterations = 100;
 
             var engine = TestingEngineFactory.CreateBugFindingEngine(
                 configuration, TestProgram.Execute);

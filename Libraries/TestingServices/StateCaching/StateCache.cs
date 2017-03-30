@@ -28,14 +28,19 @@ namespace Microsoft.PSharp.TestingServices.StateCaching
         #region fields
 
         /// <summary>
-        /// The P# runtime.
+        /// The P# bug-finding runtime.
         /// </summary>
-        private PSharpBugFindingRuntime Runtime;
+        private BugFindingRuntime Runtime;
 
         /// <summary>
-        /// A map from schedule steps to states.
+        /// Map from schedule steps to states.
         /// </summary>
         private Dictionary<ScheduleStep, State> StateMap;
+
+        /// <summary>
+        /// Set of fingerprints.
+        /// </summary>
+        private HashSet<Fingerprint> Fingerprints;
 
         #endregion
 
@@ -44,11 +49,12 @@ namespace Microsoft.PSharp.TestingServices.StateCaching
         /// <summary>
         /// Constructor.
         /// </summary>
-        /// <param name="runtime">PSharpBugFindingRuntime</param>
-        internal StateCache(PSharpBugFindingRuntime runtime)
+        /// <param name="runtime">BugFindingRuntime</param>
+        internal StateCache(BugFindingRuntime runtime)
         {
             this.Runtime = runtime;
             this.StateMap = new Dictionary<ScheduleStep, State>();
+            this.Fingerprints = new HashSet<Fingerprint>();
         }
 
         /// <summary>
@@ -98,10 +104,12 @@ namespace Microsoft.PSharp.TestingServices.StateCaching
                 Debug.WriteLine("<LivenessDebug> Captured program state '{0}' at nondeterministic " +
                     "choice '{1}'.", fingerprint.GetHashCode(), scheduleStep.IntegerChoice.Value);
             }
-
-            var stateExists = this.StateMap.Values.Any(val => val.Fingerprint.Equals(fingerprint));
+            
+            //var stateExists = this.StateMap.Values.Any(val => val.Fingerprint.Equals(fingerprint));
+            var stateExists = this.Fingerprints.Any(val => val.Equals(fingerprint));
 
             this.StateMap.Add(scheduleStep, state);
+            this.Fingerprints.Add(fingerprint);
 
             if (stateExists)
             {
