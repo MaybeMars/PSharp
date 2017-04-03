@@ -26,7 +26,7 @@ namespace Microsoft.PSharp.TestingServices.Coverage
     /// <summary>
     /// The P# code coverage reporter.
     /// </summary>
-    internal class CodeCoverageReporter
+    public class CodeCoverageReporter
     {
         #region fields
 
