@@ -454,10 +454,8 @@ namespace Microsoft.PSharp.TestingServices
             this.Assert(type.IsSubclassOf(typeof(Machine)), $"Type '{type.Name}' " +
                 "is not a machine.");
 
-            if (creator != null)
-            {
-                creator.AssertNoPendingRGP("CreateMachine");
-            }
+            this.AssertCorrectCallerMachine(creator, "CreateMachine");
+            creator?.AssertNoPendingTransitionInvocation("CreateMachine");
 
             MachineId mid = new MachineId(type, friendlyName, this);
             var isMachineTypeCached = MachineFactory.IsCached(type);
@@ -510,10 +508,8 @@ namespace Microsoft.PSharp.TestingServices
             this.Assert(type.IsSubclassOf(typeof(Machine)), $"Type '{type.Name}' " +
                 "is not a machine.");
 
-            if (creator != null)
-            {
-                creator.AssertNoPendingRGP("CreateRemoteMachine");
-            }
+            this.AssertCorrectCallerMachine(creator, "CreateRemoteMachine");
+            creator?.AssertNoPendingTransitionInvocation("CreateRemoteMachine");
 
             return this.TryCreateMachine(type, friendlyName, e, creator, false);
         }
@@ -528,10 +524,8 @@ namespace Microsoft.PSharp.TestingServices
         /// <param name="isStarter">Is starting a new operation</param>
         internal override void Send(MachineId mid, Event e, AbstractMachine sender, bool executeSynchronously, bool isStarter)
         {
-            if (sender != null)
-            {
-                sender.AssertNoPendingRGP("Send");
-            }
+            this.AssertCorrectCallerMachine(sender, "Send");
+            sender?.AssertNoPendingTransitionInvocation("Send");
 
             EventOriginInfo originInfo = null;
             if (sender != null && sender is Machine)
@@ -683,15 +677,13 @@ namespace Microsoft.PSharp.TestingServices
         /// <summary>
         /// Invokes the specified monitor with the given event.
         /// </summary>
-        /// <param name="sender">Sender machine</param>
+        /// <param name="caller">Caller machine</param>
         /// <typeparam name="T">Type of the monitor</typeparam>
         /// <param name="e">Event</param>
-        internal override void Monitor<T>(AbstractMachine sender, Event e)
+        internal override void Monitor<T>(AbstractMachine caller, Event e)
         {
-            if (sender != null)
-            {
-                sender.AssertNoPendingRGP("Monitor");
-            }
+            this.AssertCorrectCallerMachine(caller, "Monitor");
+            caller?.AssertNoPendingTransitionInvocation("Monitor");
 
             foreach (var m in this.Monitors)
             {
@@ -699,7 +691,7 @@ namespace Microsoft.PSharp.TestingServices
                 {
                     if (base.Configuration.ReportCodeCoverage)
                     {
-                        this.ReportCodeCoverageOfMonitorEvent(sender, m, e);
+                        this.ReportCodeCoverageOfMonitorEvent(caller, m, e);
                         this.ReportCodeCoverageOfMonitorTransition(m, e);
                     }
 
@@ -738,6 +730,29 @@ namespace Microsoft.PSharp.TestingServices
             }
         }
 
+        /// <summary>
+        /// Asserts that the machine calling a P# machine method is also
+        /// the machine that is currently executing.
+        /// </summary>
+        /// <param name="callerMachine">Caller machine</param>
+        /// <param name="calledAPI">Called API name</param>
+        private void AssertCorrectCallerMachine(AbstractMachine callerMachine, string calledAPI)
+        {
+            if (callerMachine == null || callerMachine is Monitor)
+            {
+                return;
+            }
+
+            var executingMachine = this.GetCurrentMachine();
+            if (executingMachine == null)
+            {
+                return;
+            }
+
+            this.Assert(executingMachine.Equals(callerMachine), $"Machine '{executingMachine.Id}' " +
+                $"invoked {calledAPI} on behalf of machine '{callerMachine.Id}'.");
+        }
+
         #endregion
 
         #region nondeterministic choices
@@ -751,10 +766,8 @@ namespace Microsoft.PSharp.TestingServices
         /// <returns>Boolean</returns>
         internal override bool GetNondeterministicBooleanChoice(AbstractMachine machine, int maxValue)
         {
-            if (machine != null)
-            {
-                machine.AssertNoPendingRGP("Random");
-            }
+            this.AssertCorrectCallerMachine(machine, "Random");
+            machine?.AssertNoPendingTransitionInvocation("Random");
 
             var choice = this.Scheduler.GetNextNondeterministicBooleanChoice(maxValue);
             if (machine != null)
@@ -780,10 +793,8 @@ namespace Microsoft.PSharp.TestingServices
         /// <returns>Boolean</returns>
         internal override bool GetFairNondeterministicBooleanChoice(AbstractMachine machine, string uniqueId)
         {
-            if (machine != null)
-            {
-                machine.AssertNoPendingRGP("FairRandom");
-            }
+            this.AssertCorrectCallerMachine(machine, "FairRandom");
+            machine?.AssertNoPendingTransitionInvocation("FairRandom");
 
             var choice = this.Scheduler.GetNextNondeterministicBooleanChoice(2, uniqueId);
             if (machine != null)
@@ -810,10 +821,8 @@ namespace Microsoft.PSharp.TestingServices
         /// <returns>Integer</returns>
         internal override int GetNondeterministicIntegerChoice(AbstractMachine machine, int maxValue)
         {
-            if (machine != null)
-            {
-                machine.AssertNoPendingRGP("RandomInteger");
-            }
+            this.AssertCorrectCallerMachine(machine, "RandomInteger");
+            machine?.AssertNoPendingTransitionInvocation("RandomInteger");
 
             var choice = this.Scheduler.GetNextNondeterministicIntegerChoice(maxValue);
             if (machine != null)
@@ -980,7 +989,8 @@ namespace Microsoft.PSharp.TestingServices
         /// <param name="toState">Next to top state of the stack</param>
         internal override void NotifyPop(Machine machine, Type fromState, Type toState)
         {
-            machine.AssertCorrectRGPInvocation();
+            this.AssertCorrectCallerMachine(machine, "Pop");
+            machine.AssertCorrectTransitionInvocation();
 
             if (base.Configuration.ReportCodeCoverage)
             {
@@ -997,7 +1007,8 @@ namespace Microsoft.PSharp.TestingServices
         internal override void NotifyRaisedEvent(AbstractMachine machine, EventInfo eventInfo,
             bool isStarter)
         {
-            machine.AssertCorrectRGPInvocation();
+            this.AssertCorrectCallerMachine(machine, "Raise");
+            machine.AssertCorrectTransitionInvocation();
 
             if (machine is Machine)
             {
@@ -1040,7 +1051,8 @@ namespace Microsoft.PSharp.TestingServices
         {
             this.Assert(!machine.IsInsideSynchronousCall, $"Machine '{machine.Id}' called " +
                 "receive while executing synchronously.");
-            machine.AssertNoPendingRGP("Receive");
+            this.AssertCorrectCallerMachine(machine, "Receive");
+            machine.AssertNoPendingTransitionInvocation("Receive");
         }
 
         /// <summary>

@@ -40,7 +40,7 @@ namespace Microsoft.PSharp.TestingServices.Tests.Unit
 
         class E : Event { }
 
-        class Program : Machine
+        class M : Machine
         {
             [Start]
             [OnEntry(nameof(EntryInit))]
@@ -84,11 +84,10 @@ namespace Microsoft.PSharp.TestingServices.Tests.Unit
         public void TestGotoStateTopLevelActionFail1()
         {
             var test = new Action<PSharpRuntime>((r) => {
-                r.CreateMachine(typeof(Program), new Configure(ErrorType.CALL_GOTO));
+                r.CreateMachine(typeof(M), "M", new Configure(ErrorType.CALL_GOTO));
             });
 
-            var bugReport = "Machine 'Microsoft.PSharp.TestingServices.Tests.Unit.GotoStateTopLevelActionFailTest+Program()' " +
-                "has called multiple raise/goto/pop in the same action.";
+            var bugReport = "Machine 'M()' has called multiple Raise, Goto or Pop in the same action.";
             base.AssertFailed(test, bugReport);
         }
 
@@ -96,11 +95,10 @@ namespace Microsoft.PSharp.TestingServices.Tests.Unit
         public void TestGotoStateTopLevelActionFail2()
         {
             var test = new Action<PSharpRuntime>((r) => {
-                r.CreateMachine(typeof(Program), new Configure(ErrorType.CALL_RAISE));
+                r.CreateMachine(typeof(M), "M", new Configure(ErrorType.CALL_RAISE));
             });
 
-            var bugReport = "Machine 'Microsoft.PSharp.TestingServices.Tests.Unit.GotoStateTopLevelActionFailTest+Program()' " +
-                "has called multiple raise/goto/pop in the same action.";
+            var bugReport = "Machine 'M()' has called multiple Raise, Goto or Pop in the same action.";
             base.AssertFailed(test, bugReport);
         }
 
@@ -108,11 +106,10 @@ namespace Microsoft.PSharp.TestingServices.Tests.Unit
         public void TestGotoStateTopLevelActionFail3()
         {
             var test = new Action<PSharpRuntime>((r) => {
-                r.CreateMachine(typeof(Program), new Configure(ErrorType.CALL_SEND));
+                r.CreateMachine(typeof(M), "M", new Configure(ErrorType.CALL_SEND));
             });
 
-            var bugReport = "Machine 'Microsoft.PSharp.TestingServices.Tests.Unit.GotoStateTopLevelActionFailTest+Program()' " +
-                "cannot call API 'Send' after calling raise/goto/pop in the same action.";
+            var bugReport = "Machine 'M()' cannot call 'Send' after calling Raise, Goto or Pop in the same action.";
             base.AssertFailed(test, bugReport);
         }
 
@@ -120,11 +117,10 @@ namespace Microsoft.PSharp.TestingServices.Tests.Unit
         public void TestGotoStateTopLevelActionFail4()
         {
             var test = new Action<PSharpRuntime>((r) => {
-                r.CreateMachine(typeof(Program), new Configure(ErrorType.ON_EXIT));
+                r.CreateMachine(typeof(M), "M", new Configure(ErrorType.ON_EXIT));
             });
 
-            var bugReport = "Machine 'Microsoft.PSharp.TestingServices.Tests.Unit.GotoStateTopLevelActionFailTest+Program()' " +
-                "has called raise/goto/pop inside an OnExit method.";
+            var bugReport = "Machine 'M()' has called Raise, Goto or Pop inside an OnExit action.";
             base.AssertFailed(test, bugReport);
         }
 

@@ -366,10 +366,10 @@ namespace Microsoft.PSharp
         /// <summary>
         /// Invokes the specified <see cref="PSharp.Monitor"/> with the specified <see cref="Event"/>.
         /// </summary>
-        /// <param name="sender">Sender machine</param>
+        /// <param name="caller">Caller machine</param>
         /// <typeparam name="T">Type of the monitor</typeparam>
         /// <param name="e">Event</param>
-        internal abstract void Monitor<T>(AbstractMachine sender, Event e);
+        internal abstract void Monitor<T>(AbstractMachine caller, Event e);
 
         /// <summary>
         /// Checks if the assertion holds, and if not it throws an

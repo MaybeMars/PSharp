@@ -48,10 +48,10 @@ namespace Microsoft.PSharp
         internal bool IsInsideOnExit;
 
         /// <summary>
-        /// Checks if the current machine action called
-        /// Raise/Goto/Pop (RGP).
+        /// Checks if the currently executing machine action invoked
+        /// a transition (i.e. raise, goto or pop).
         /// </summary>
-        internal bool CurrentActionCalledRGP;
+        internal bool IsPendingTransition;
 
         /// <summary>
         /// Program counter used for state-caching. Distinguishes
@@ -70,7 +70,7 @@ namespace Microsoft.PSharp
         {
             this.OperationId = 0;
             this.IsInsideOnExit = false;
-            this.CurrentActionCalledRGP = false;
+            this.IsPendingTransition = false;
         }
 
         /// <summary>
@@ -148,28 +148,28 @@ namespace Microsoft.PSharp
             return false;
         }
 
-
         /// <summary>
-        /// Asserts that a Raise/Goto/Pop hasn't already been called.
-        /// Records that RGP has been called.
+        /// Asserts that a raise, goto or pop method has not already been called.
+        /// Also records that a raise, goto or pop method has been called.
         /// </summary>
-        internal void AssertCorrectRGPInvocation()
+        internal void AssertCorrectTransitionInvocation()
         {
-            this.Runtime.Assert(!this.IsInsideOnExit, "Machine '{0}' has called raise/goto/pop " +
-                "inside an OnExit method.", this.Id.Name);
-            this.Runtime.Assert(!this.CurrentActionCalledRGP, "Machine '{0}' has called multiple " +
-                "raise/goto/pop in the same action.", this.Id.Name);
-
-            this.CurrentActionCalledRGP = true;
+            this.Runtime.Assert(!this.IsInsideOnExit, $"Machine '{this.Id}' has called " +
+                "Raise, Goto or Pop inside an OnExit action.");
+            this.Runtime.Assert(!this.IsPendingTransition, $"Machine '{this.Id}' has " +
+                "called multiple Raise, Goto or Pop in the same action.");
+            this.IsPendingTransition = true;
         }
 
         /// <summary>
-        /// Asserts that a Raise/Goto/Pop hasn't already been called.
+        /// Asserts that a transition method has not already been invoked.
+        /// Transition methods include raise, goto and pop.
         /// </summary>
-        internal void AssertNoPendingRGP(string calledAPI)
+        /// <param name="callee">Callee</param>
+        internal void AssertNoPendingTransitionInvocation(string callee)
         {
-            this.Runtime.Assert(!this.CurrentActionCalledRGP, "Machine '{0}' cannot call API '{1}' " +
-                "after calling raise/goto/pop in the same action.", this.Id.Name, calledAPI);
+            this.Runtime.Assert(!this.IsPendingTransition, $"Machine '{this.Id}' cannot " +
+                $"call '{callee}' after calling Raise, Goto or Pop in the same action.");
         }
 
         #endregion

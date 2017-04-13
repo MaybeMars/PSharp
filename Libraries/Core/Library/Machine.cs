@@ -758,7 +758,7 @@ namespace Microsoft.PSharp
         /// <param name="e">Event to handle</param>
         private void HandleEvent(Event e)
         {
-            base.CurrentActionCalledRGP = false;
+            base.IsPendingTransition = false;
 
             while (true)
             {

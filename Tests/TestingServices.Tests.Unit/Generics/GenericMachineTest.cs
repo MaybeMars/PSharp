@@ -20,7 +20,7 @@ namespace Microsoft.PSharp.TestingServices.Tests.Unit
 {
     public class GenericMachineTest : BaseTest
     {
-        class Program<T> : Machine
+        class M<T> : Machine
         {
             T Item;
 
@@ -46,7 +46,10 @@ namespace Microsoft.PSharp.TestingServices.Tests.Unit
         [Fact]
         public void TestGenericMachine()
         {
-            var test = new Action<PSharpRuntime>((r) => { r.CreateMachine(typeof(Program<int>)); });
+            var test = new Action<PSharpRuntime>((r) => {
+                r.CreateMachine(typeof(M<int>));
+            });
+
             base.AssertSucceeded(test);
         }
     }

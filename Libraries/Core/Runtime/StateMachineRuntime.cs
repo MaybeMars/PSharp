@@ -547,10 +547,10 @@ namespace Microsoft.PSharp
         /// <summary>
         /// Invokes the specified <see cref="PSharp.Monitor"/> with the specified <see cref="Event"/>.
         /// </summary>
-        /// <param name="sender">Sender machine</param>
+        /// <param name="caller">Caller machine</param>
         /// <typeparam name="T">Type of the monitor</typeparam>
         /// <param name="e">Event</param>
-        internal override void Monitor<T>(AbstractMachine sender, Event e)
+        internal override void Monitor<T>(AbstractMachine caller, Event e)
         {
             if (!base.Configuration.EnableMonitorsInProduction)
             {

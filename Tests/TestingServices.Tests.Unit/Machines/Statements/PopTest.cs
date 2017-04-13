@@ -22,7 +22,7 @@ namespace Microsoft.PSharp.TestingServices.Tests.Unit
     {
         class E : Event { }
 
-        class Program : Machine
+        class M : Machine
         {
 
             [Start]
@@ -37,10 +37,13 @@ namespace Microsoft.PSharp.TestingServices.Tests.Unit
         }
 
         [Fact]
-        public void TestGroupState()
+        public void TestPopState()
         {
-            var test = new Action<PSharpRuntime>((r) => { r.CreateMachine(typeof(Program)); });
-            var bugReport = "Machine 'Microsoft.PSharp.TestingServices.Tests.Unit.PopTest+Program()' popped with no matching push.";
+            var test = new Action<PSharpRuntime>((r) => {
+                r.CreateMachine(typeof(M), "M");
+            });
+
+            var bugReport = "Machine 'M()' popped with no matching push.";
             base.AssertFailed(test, bugReport);
         }
     }
