@@ -339,6 +339,19 @@ namespace Microsoft.PSharp.TestingServices
 
         #endregion
 
+        #region shared data structures
+
+        /// <summary>
+        /// Creates a shared counter
+        /// </summary>
+        /// <param name="value">Initial value</param> 
+        public override ISharedCounter CreateSharedCounter(int value = 0)
+        {
+            return new ProductionSharedCounter(value);
+        }
+
+        #endregion
+
         #region internal methods
 
         /// <summary>

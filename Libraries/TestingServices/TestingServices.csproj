@@ -63,6 +63,7 @@
     <Compile Include="Liveness\LivenessChecker.cs" />
     <Compile Include="Runtime\AsynchronousTaskScheduler.cs" />
     <Compile Include="Runtime\BugFindingRuntime.cs" />
+    <Compile Include="Runtime\MockSharedCounter.cs" />
     <Compile Include="Runtime\TestHarnessMachine.cs" />
     <Compile Include="Scheduling\BugFindingScheduler.cs" />
     <Compile Include="Scheduling\MachineInfo.cs" />
