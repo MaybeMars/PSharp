@@ -85,8 +85,12 @@ namespace Microsoft.PSharp
         /// temperature reaches the specified limit, then a potential
         /// liveness bug has been found.
         /// </summary>
-        private int LivenessTemperature;
+        public int LivenessTemperature;
 
+        /// <summary>
+        /// Liveness FP reporting
+        /// </summary>
+        public int ThresholdReports;
         #endregion
 
         #region properties
@@ -161,6 +165,7 @@ namespace Microsoft.PSharp
         {
             this.ActionMap = new Dictionary<string, MethodInfo>();
             this.LivenessTemperature = 0;
+            this.ThresholdReports = 0;
         }
 
         #endregion
@@ -463,10 +468,15 @@ namespace Microsoft.PSharp
                 base.Runtime.Configuration.LivenessTemperatureThreshold > 0)
             {
                 this.LivenessTemperature++;
-                base.Runtime.Assert(this.LivenessTemperature <= base.Runtime.
-                    Configuration.LivenessTemperatureThreshold,
-                    $"Monitor '{this.GetType().Name}' detected potential liveness " +
-                    $"bug in hot state '{this.CurrentStateName}'.");
+                if(LivenessTemperature > base.Runtime.Configuration.LivenessTemperatureThreshold
+                    && ThresholdReports == 0 && !base.Runtime.Configuration.EnableCycleReplayingStrategy)
+                {
+                    ThresholdReports++;
+                }
+                //base.Runtime.Assert(this.LivenessTemperature <= base.Runtime.
+                //    Configuration.LivenessTemperatureThreshold,
+                //    $"Monitor '{this.GetType().Name}' detected potential liveness " +
+                //    $"bug in hot state '{this.CurrentStateName}'.");
             }
         }
 

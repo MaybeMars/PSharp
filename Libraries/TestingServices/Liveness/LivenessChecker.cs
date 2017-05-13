@@ -89,6 +89,8 @@ namespace Microsoft.PSharp.TestingServices.Liveness
         public int DiscardedCycles;
         private int LassoLength;
 
+        private bool Reported;
+
         #endregion
 
         public int GetLassoLength()
@@ -121,6 +123,7 @@ namespace Microsoft.PSharp.TestingServices.Liveness
 
             this.DiscardedCycles = 0;
             this.LassoLength = 0;
+            this.Reported = false;
         }
 
         /// <summary>
@@ -185,6 +188,12 @@ namespace Microsoft.PSharp.TestingServices.Liveness
                 }
 
                 this.LivenessTemperature++;
+                if (this.LivenessTemperature == (this.Runtime.Configuration.LivenessTemperatureThreshold / 10) &&
+                    !Reported)
+                {
+                    Output.WriteLine("Replay threshold reached ");
+                    Reported = true;
+                }
                 if (this.LivenessTemperature > this.Runtime.Configuration.LivenessTemperatureThreshold)
                 {
                     foreach (var monitor in this.HotMonitors)
@@ -214,6 +223,15 @@ namespace Microsoft.PSharp.TestingServices.Liveness
         /// </summary>
         internal void CheckLivenessAtTermination()
         {
+            foreach (var monitor in this.Monitors)
+            {
+                if(monitor.ThresholdReports > 0 
+                    && (monitor.IsInColdState() || monitor.LivenessTemperature < this.Runtime.Configuration.LivenessTemperatureThreshold))
+                {
+                    Output.WriteLine("Threshold reached: ");
+                    this.Runtime.Scheduler.NotifyAssertionFailure("False positive", false);
+                }
+            }
             // Checks if the program has naturally terminated.
             if (!this.Runtime.Scheduler.HasFullyExploredSchedule)
             {
@@ -379,7 +397,7 @@ namespace Microsoft.PSharp.TestingServices.Liveness
                 //Console.WriteLine("Found a lasso");
                 //this.Runtime.Scheduler.NotifyAssertionFailure("Found a Lasso!! " + this.PotentialCycle.Count);
                 this.EndOfCycleIndex = this.PotentialCycle.Select(val => val.Item1).Min(val => val.Index);
-                this.Runtime.Configuration.LivenessTemperatureThreshold = 10 * this.PotentialCycle.Count;
+                this.Runtime.Configuration.LivenessTemperatureThreshold = 100 * this.PotentialCycle.Count;
                 this.Runtime.Scheduler.SwitchSchedulingStrategy(this);
             }
             else
