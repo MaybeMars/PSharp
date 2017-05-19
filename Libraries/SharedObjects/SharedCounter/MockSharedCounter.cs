@@ -26,7 +26,7 @@ namespace Microsoft.PSharp.TestingServices
         public MockSharedCounter(int value, BugFindingRuntime Runtime)
         {
             this.Runtime = Runtime;
-            var counterMachine = Runtime.CreateMachine(typeof(SharedCounterMachine));
+            counterMachine = Runtime.CreateMachine(typeof(SharedCounterMachine));
             Runtime.SendEvent(counterMachine, SharedCounterEvent.SetEvent(value));
         }
 

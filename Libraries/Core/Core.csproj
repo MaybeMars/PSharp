@@ -105,8 +105,6 @@
     <Compile Include="Runtime\Exceptions\AssertionFailureException.cs" />
     <Compile Include="Runtime\Exceptions\ExecutionCanceledException.cs" />
     <Compile Include="Runtime\Exceptions\RuntimeException.cs" />
-    <Compile Include="Runtime\ISharedCounter.cs" />
-    <Compile Include="Runtime\ProductionSharedCounter.cs" />
     <Compile Include="Runtime\PSharpRuntime.cs" />
     <Compile Include="Runtime\StateMachineRuntime.cs" />
     <Compile Include="Utilities\ErrorReporter.cs" />

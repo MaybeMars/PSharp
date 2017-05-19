@@ -280,16 +280,6 @@ namespace Microsoft.PSharp
 
         #endregion
 
-        #region shared data structures
-
-        /// <summary>
-        /// Creates a shared counter
-        /// </summary>
-        /// <param name="value">Initial value</param>
-        public abstract ISharedCounter CreateSharedCounter(int value = 0);
-
-        #endregion
-
         #region state-machine execution
 
         /// <summary>

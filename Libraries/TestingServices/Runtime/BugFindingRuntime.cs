@@ -339,19 +339,6 @@ namespace Microsoft.PSharp.TestingServices
 
         #endregion
 
-        #region shared data structures
-
-        /// <summary>
-        /// Creates a shared counter
-        /// </summary>
-        /// <param name="value">Initial value</param> 
-        public override ISharedCounter CreateSharedCounter(int value = 0)
-        {
-            return new ProductionSharedCounter(value);
-        }
-
-        #endregion
-
         #region internal methods
 
         /// <summary>
@@ -1364,7 +1351,7 @@ namespace Microsoft.PSharp.TestingServices
         /// Gets the currently executing <see cref="Machine"/>.
         /// </summary>
         /// <returns>Machine or null, if not present</returns>
-        private Machine GetCurrentMachine()
+        internal Machine GetCurrentMachine()
         {
             //  The current task does not correspond to a machine.
             if (Task.CurrentId == null)
